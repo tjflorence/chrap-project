@@ -1,0 +1,14 @@
+num_frames = 1000;
+
+start(vi);
+pause(.01);
+test_frame = peekdata(vi, 1);
+stop(vi);
+flushdata(vi);
+
+frame_dims = size(test_frame);
+
+frame_mat = nan(frame_dims(1), frame_dims(2), num_frames);
+
+for ii = 1:num_frames
+    
