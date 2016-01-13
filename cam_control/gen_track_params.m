@@ -33,7 +33,7 @@ disp(['expected_wait: ' num2str(num_frames/100, '%.4g') ' seconds'])
 pause(.005)
 for ii = 1:num_frames
     
-    frame_mat(:,:,ii) = peekdata(vi, 1);
+    frame_mat(:,:,ii) = getsnapshot(vi);
     pause(.005)
 
 end

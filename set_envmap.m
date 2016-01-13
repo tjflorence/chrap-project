@@ -1,7 +1,8 @@
-function env_map = set_envmap()
+function env_map = set_envmap(track_params)
 %{
     
     creates 2x2 tilemap lookup table for tracking
+    modify here to change punished world
 
 %}
 
@@ -12,6 +13,6 @@ mid_x = (track_params.frame_dim(2))/2;
 env_map(1).lookup(1:mid_y, 1:mid_x) = 1;
 env_map(1).lookup(mid_y:end, mid_x:end) = 1;
 
-env_map(2).env_map = fliplr(exp_struct(1).env_map);
+env_map(2).lookup = fliplr(env_map(1).lookup);
 
 end
