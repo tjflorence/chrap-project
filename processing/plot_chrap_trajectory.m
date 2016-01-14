@@ -1,4 +1,4 @@
-function plot_chrap_condition_summary(expdir)
+function plot_chrap_trajectory(expdir)
 
 close all
 
