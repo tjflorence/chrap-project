@@ -70,7 +70,7 @@ set(gca, 'XTick', [1 2 3], 'YTick', [-1 -.5 0 .5 1], 'FontSize', 25, ...
 ylabel('quadrant preference')
 
 s1 = subplot(3,3,4);
-load(c_files(1).name)
+load(c_files(5).name)
 
 bg_img = trial.settings.track_params.bg;
 max_val = max(max(bg_img));
