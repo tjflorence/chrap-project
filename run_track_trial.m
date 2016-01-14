@@ -4,7 +4,7 @@ function trial = run_track_trial(vi,...
                             trial_time, ...
                             light_power, ...
                             track_params, ...
-                            env_map)
+                            env_map, keep_frame)
 %{
     
     run single trial
@@ -32,6 +32,7 @@ trial.data.light = nan(50*trial_time, 1);
 trial.data.tstamp = nan(50*trial_time, 1);
 trial.data.counter = nan(50*trial_time, 1);
 trial.data.tracked_frames = nan(50*trial_time, 1);
+trial.data.select_pix = nan(61,61, 50*trial_time);
 
 tic
 tstamp = toc;
@@ -43,7 +44,7 @@ while tstamp < trial_time
     
     p = p+1;
     
-    fly = track_frame(vi, track_params);
+    [fly,  select_pix]= track_frame(vi, track_params);
     
     % handle missed frames and make a note of it
     if isnan(fly.y) || isnan(fly.x)
@@ -56,28 +57,16 @@ while tstamp < trial_time
         trial.data.tracked_frames(p)=1;
     end
         
-    
-    do_light = env_map(round(fly.y), round(fly.x));
-    
+    do_light = env_map(fly.y, fly.x);
     
     if do_light == 1
         daqObj.outputSingleScan([0 light_power]);
     else
        daqObj.outputSingleScan([0 -4.99]); 
     end
-    
-    if p > 1
-        
-        if sqrt( ((fly.x - trial.data.xy(p-1,1) )^2) + ((fly.y - trial.data.xy(p-1,2))^2) ) > 12
-            fly.x = trial.data.xy(p-1,1);
-            fly.y = trial.data.xy(p-1,2);
-            trial.data.tracked_frames(p)=-1;
-        end
-        
-    end
-    
+
     tstamp = toc;
-    
+    trial.data.select_pix(:,:,p) = select_pix;
     trial.data.xy(p,:) = [fly.x fly.y];
     trial.data.light(p) = do_light;
     trial.data.tstamp(p) = tstamp;
@@ -92,4 +81,4 @@ flushdata(vi);
 
 trial.data.pref_idx = (numel(find(trial.data.light==0))-numel(find(trial.data.light==1)))/trial.data.p;
 
-save([trial_name '.mat'], 'trial')
+save([trial_name '.mat'], 'trial', '-v7.3')
