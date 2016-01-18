@@ -93,18 +93,13 @@ plot([-100 1000], [0 0], 'k')
 
 box off
 
-set(gca, 'YTick', [-.3 0 .3 .6 .9], 'XTickLabel', {'Off', '6', '12', '18',  '24', '30'},...
+set(gca, 'YTick', [-.3 0 .3 .6 .9], 'XTickLabel', {'Off', '6.2', '12.4', '18.4',  '24.4', '30.1'},...
     'Fontsize', 25);
 
 ylabel('pref idx (-1:1)', 'Fontsize', 30)
-xlabel('\newlinered (630 nm) intensity\newline      (uW/mm^2)')
+xlabel('\newlinered (630) intensity\newline       (uW/mm^2)')
 
-text(.55, .85, ['HC-gal4 x UAS-Chr (n = ' num2str(size(geno(3).summary_data, 1)) ')'],...
-    'Fontsize', 20, 'color', 'r');
-text(.55, .77, ['GR28.b-gal4 x UAS-Chr (n = ' num2str(size(geno(2).summary_data, 1)) ')'],...
-    'Fontsize', 20, 'color', 'b');
-text(.55, .69, ['Empty-gal4 x UAS-Chr (n = ' num2str(size(geno(1).summary_data, 1)) ')'],...
-    'Fontsize', 20, 'color', 'k');
+text(1, .85, ['HC-gal4 x UAS-Chr, n = ' num2str()])
 
 
 
