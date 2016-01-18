@@ -12,6 +12,8 @@ summary.pi_std = nan(1,5);
 
 
 cd(expdir);
+
+
 for jj = 1:length(summary.conditions)
     
     c_power = summary.conditions{jj};
