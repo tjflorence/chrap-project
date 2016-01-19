@@ -1,4 +1,4 @@
-disp('turn off fxn generator output, then hit space')
+ disp('turn off fxn generator output, then hit space')
 pause()
 
 init_memspace
@@ -13,15 +13,15 @@ disp('thank you')
 
 %% experiment settings: modify as needed
 exp.settings.name = 'chrap-curve';
-exp.settings.geno = 'rando';
+exp.settings.geno = 'HCxUAS-Chr';
 exp.settings.datecode = datestr(now, 'yyyymmddHHMM');
-exp.settings.notes = '6 days old';
+exp.settings.notes = '1-2 day old, green lights off';
 exp.settings.full_name = [exp.settings.datecode '_' exp.settings.geno '_' exp.settings.name];
 
 exp.settings.std_thresh = 1.2;
 exp.settings.bg_frames = 1000;
-exp.settings.trial_time = 30; % trial time in seconds
-exp.settings.light_power = [-4.99 -4 -3 -2 -1 0];
+exp.settings.trial_time = 60; % trial time in seconds
+exp.settings.light_power = [-4.99 -4 -3 -2 -1 -0];
 exp.settings.reps_per_power = 3;
 exp.settings.keep_frames = 0;
 exp.settings.rand_order = 0;
@@ -57,10 +57,14 @@ exp.cam_params = cam_params;
 f1 = figure('Position', [999 72 795 420], 'color', 'w');
 plot([-100 100], [0 0], 'k')
 ylim([-1 1])
-xlim([-5.5 0])
+xlim([exp.settings.light_power(1)-.5 exp.settings.light_power(end)+.5])
 
-set(gca, 'XTick', [-4.99 -4 -3 -2 -1 0], ...
-    'XTickLabel', {'Off', '-4', '-3', '-2', '-1', '0'}, ...
+plot_labels = {'Off'};
+for ii = 2:length(exp.settings.light_power)
+    plot_labels{1, ii} = exp.settings.light_power(ii);
+end
+set(gca, 'XTick', exp.settings.light_power, ...
+    'XTickLabel',plot_labels, ...
     'YTick', [-1 -.5 0 .5 1]);
 xlabel('power')
 ylabel('pref idx')

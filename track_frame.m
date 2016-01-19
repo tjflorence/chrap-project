@@ -14,4 +14,6 @@ function [fly, select_pix] = track_frame(vi, track_params)
     fly.num_pix = length(yvals);
     
     select_pix = c_frame((fly.y-30):(fly.y+30), (fly.x-30):(fly.x+30));
+    
+    
 end

@@ -1,4 +1,4 @@
-function track_params = gen_track_params(vi, num_frames, thresh)
+function track_params = gen_track_params(vi, num_frames, thresh, daqObj)
 
 %{
 generates tracking parameters for online fly tracking
@@ -19,7 +19,7 @@ track_params, a structure which includes
 
 start(vi);
 pause(.01);
-test_frame = peekdata(vi, 1);
+test_frame = getsnapshot(vi);
 stop(vi);
 flushdata(vi);
 
@@ -29,14 +29,18 @@ frame_mat = nan(frame_dims(1), frame_dims(2), num_frames);
 
 start(vi);
 disp('generating bg image')
-disp(['expected_wait: ' num2str(num_frames/100, '%.4g') ' seconds'])
+disp(['expected_wait: ' num2str(num_frames/40, '%.4g') ' seconds'])
 pause(.005)
+
+daqObj.outputSingleScan([0 -4.5]);
 for ii = 1:num_frames
     
     frame_mat(:,:,ii) = getsnapshot(vi);
     pause(.005)
 
 end
+daqObj.outputSingleScan([0 -4.99]);
+
 stop(vi);
 flushdata(vi);
 disp('completed')
