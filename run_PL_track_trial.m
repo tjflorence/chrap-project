@@ -26,6 +26,7 @@ trial.settings.trial_time = trial_time;
 
 % initialize memspace
 trial.data.xy = nan(50*trial_time, 2);
+trial.data.xy_filt = nan(50*trial_time, 2);
 trial.data.light_power = nan(50*trial_time, 1);
 trial.data.tstamp = nan(50*trial_time, 1);
 trial.data.counter = nan(50*trial_time, 1);
@@ -46,25 +47,14 @@ while tstamp < trial_time
     
     p = p+1;
     
-    [fly,  select_pix]= track_frame(vi, track_params);
+    [fly,  select_pix, trial] = track_frame(vi, track_params, trial);
     
-    % handle missed frames and make a note of it
-    if isnan(fly.y) || isnan(fly.x)
-        if p > 1
-            fly.x = trial.data.xy(p-1,1);
-            fly.y = trial.data.xy(p-1,2);
-            trial.data.tracked_frames(p)= 0;
-        end
-    else
-        trial.data.tracked_frames(p)=1;
-    end
         
     light_power = env_map(fly.y, fly.x);
     daqObj.outputSingleScan([0 light_power]);
         
     tstamp = toc;
     trial.data.select_pix(:,:,p) = select_pix;
-    trial.data.xy(p,:) = [fly.x fly.y];
     trial.data.light_power(p) = light_power;
     trial.data.tstamp(p) = tstamp;
 

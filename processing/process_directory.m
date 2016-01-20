@@ -4,7 +4,7 @@
 
 %}
 homedir = pwd;
-datadir = '/Users/florencet/Documents/matlab_root/chrap-project/meeting_and_analysis/20160117';
+datadir = '/Users/florencet/Documents/matlab_root/chrap-project/meeting_and_analysis/20160118';
 
 cd(datadir)
 

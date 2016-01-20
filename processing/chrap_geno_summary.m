@@ -8,7 +8,7 @@ geno(3).strterm = '*HC*'
 geno(3).p = 1;
 
 %% Collect experiment files
-datadir = '/Users/florencet/Documents/matlab_root/chrap-project/meeting_and_analysis/20160117';
+datadir = '/Users/florencet/Documents/matlab_root/chrap-project/meeting_and_analysis/20160118';
 
 cd(datadir)
 dayfiles = dir('2016*');
@@ -108,6 +108,10 @@ text(.55, .69, ['Empty-gal4 x UAS-Chr (n = ' num2str(size(geno(1).summary_data, 
 
 
 
+cd('/Users/florencet/Documents/matlab_root/chrap-project')
+
+
+print(f1, ['genotype_summary.pdf'], '-dpdf', '-r0', '-opengl');
 
 
 
