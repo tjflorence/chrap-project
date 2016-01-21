@@ -40,15 +40,20 @@ p = 0;
 start(vi)
 
 daqObj.outputSingleScan([0 -3]);
-Panel_com('set_position', [pat_pos 1])
+if pat_pos > 0
+    Panel_com('set_position', [pat_pos 1])
+else
+    Panel_com('all_off');
+end
 
 % this loop runs the trial
 while tstamp < trial_time
     
     p = p+1;
     
-    [fly,  select_pix, trial] = track_frame(vi, track_params, trial);
+    trial.data.p = p;
     
+    [fly,  select_pix, trial] = track_frame(vi, track_params, trial);
         
     light_power = env_map(fly.y, fly.x);
     daqObj.outputSingleScan([0 light_power]);
@@ -63,7 +68,7 @@ end
 daqObj.outputSingleScan([0 light_power]);
 Panel_com('all_off')
 
-trial.data.p = p;
+
 
 stop(vi);
 flushdata(vi);

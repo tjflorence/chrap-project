@@ -3,7 +3,7 @@ function [fly, select_pix, trial] = track_frame(vi, track_params, trial)
     tracks single frame
     returns struct of x,y pixel locations, and fly size in pixels
 %}
-    hist_len = 15;
+    hist_len = 14;
     
     c_frame = double(getsnapshot(vi));
 
@@ -20,23 +20,25 @@ function [fly, select_pix, trial] = track_frame(vi, track_params, trial)
         if p > 1
             tentative_x = trial.data.xy(p-1,1);
             tentative_y = trial.data.xy(p-1,2);
-            trial.data.tracked_frames(p)= 0;
+            trial.data.tracked_frames(trial.data.p)= 0;
+        else
+            err('no fly found on first frame')
         end
     else
-        trial.data.tracked_frames(p)=1;
+        trial.data.tracked_frames(trial.data.p)=1;
     end
     
     
     trial.data.xy(trial.data.p, :) = [tentative_x tentative_y];
     
     % get rid of spurious tracking results: kalman filter
-    if trial.data.p < hist_len+1; % only use prior once we have enough observations
+    if trial.data.p < (3*hist_len)+1; % only use prior once we have enough observations
         
         trial.data.xy_filt(trial.data.p, :) = [tentative_x tentative_y];
         
     else
         
-        z = trial.data.xy(trial.data.p-hist_len:trial.data.p-hist_len,:)';
+        z = trial.data.xy(trial.data.p-(3*hist_len):trial.data.p,1:2)';
         [x_kf, ~] = StandardKalmanFilter(z, hist_len, hist_len, 'EWMA');
         
         trial.data.xy_filt(trial.data.p, :) = round(x_kf(1:2, end)');
