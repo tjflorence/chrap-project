@@ -17,7 +17,7 @@ function [fly, select_pix, trial] = track_frame(vi, track_params, trial)
     
     % handle missed frames and make a note of it
     if isnan(tentative_y) || isnan(tentative_x)
-        if p > 1
+        if trial.data.p > 1
             tentative_x = trial.data.xy(p-1,1);
             tentative_y = trial.data.xy(p-1,2);
             trial.data.tracked_frames(trial.data.p)= 0;

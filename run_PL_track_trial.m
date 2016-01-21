@@ -56,6 +56,18 @@ while tstamp < trial_time
     [fly,  select_pix, trial] = track_frame(vi, track_params, trial);
         
     light_power = env_map(fly.y, fly.x);
+    
+    if light_power > -4.90
+        light_power = normrnd(light_power, .1);
+    else
+        light_power = normrnd(light_power, .01);
+    end
+
+    
+    if light_power < -4.99
+        light_power = -4.99;
+    end
+    
     daqObj.outputSingleScan([0 light_power]);
         
     tstamp = toc;
