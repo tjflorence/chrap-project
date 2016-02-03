@@ -5,7 +5,7 @@ cd(expdir)
 
 load('metadata.mat')
 
-if exp.completed == 0
+if expp.completed == 0
     cd('..')
     rmdir(expdir, 's')
 else
@@ -23,11 +23,12 @@ else
     for ii = 1:length(tfiles)
    
         load(tfiles(ii).name)
-        trial = calc_tspeed(trial, exp);
-        trial = calc_time_to_target(trial, exp);
-        trial = calc_time_at_target(trial, exp);
-        trial = calc_quad_pref(trial, exp);
-        trial = calc_direction_idx(trial, exp);
+        trial = calc_tspeed(trial, expp);
+        trial = calc_theta(trial, expp);
+        trial = calc_time_to_target(trial, expp);
+        trial = calc_time_at_target(trial, expp);
+        trial = calc_quad_pref(trial, expp);
+        trial = calc_direction_idx(trial, expp);
         
         summary_data.mean_speed(ii) = nanmean(trial.data.speed(trial.data.speed>5));
         summary_data.time_to_target(ii) = trial.data.time_to_target;
@@ -57,9 +58,14 @@ end
 
   
 
-function trial = calc_tspeed(trial, exp)
+function trial = calc_tspeed(trial, expp)
     
     mm_per_pix = 0.2073;
+    
+    
+    if ~isfield(trial.data, 'xy_filt')
+        trial.data.xy_filt = trial.data.xy;
+    end
     
     x = trial.data.xy_filt(:,1);
     y = trial.data.xy_filt(:,2);
@@ -78,9 +84,20 @@ function trial = calc_tspeed(trial, exp)
      
 end
 
-function trial = calc_time_to_target(trial, exp)
+function trial = calc_theta(trial, expp)
 
-    c_power = exp.settings.stim_power;
+    xdiff = trial.data.xy(2:end, 1) - trial.data.xy(1:end-1, 1);
+    ydiff = trial.data.xy(2:end, 2) - trial.data.xy(1:end-1, 2);
+
+    trial.data.theta = [0 ; movingmean(atan2d(ydiff, xdiff), 15)];
+
+end
+
+
+
+function trial = calc_time_to_target(trial, expp)
+
+    c_power = expp.settings.stim_power;
     
     at_target_ind = find(trial.data.light_power < c_power, 1, 'first');
     if ~isempty(at_target_ind)
@@ -91,9 +108,9 @@ function trial = calc_time_to_target(trial, exp)
 
 end
 
-function trial = calc_time_at_target(trial, exp)
+function trial = calc_time_at_target(trial, expp)
     
-    c_power = exp.settings.stim_power;
+    c_power = expp.settings.stim_power;
 
     hz = trial.data.p/trial.data.tstamp(trial.data.p);
     cool_inds = find(trial.data.light_power < c_power);
@@ -106,7 +123,7 @@ function trial = calc_time_at_target(trial, exp)
     
 end
 
-function trial = calc_quad_pref(trial, exp)
+function trial = calc_quad_pref(trial, expp)
 
     split_1 = strsplit(trial.name, 'quad');
     split_2 = strsplit(split_1{2}, 'd');
@@ -211,7 +228,7 @@ function trial = calc_quad_pref(trial, exp)
     
 end
 
-function trial = calc_direction_idx(trial, exp)
+function trial = calc_direction_idx(trial, expp)
 
     split_1 = strsplit(trial.name, 'quad');
     split_2 = strsplit(split_1{2}, 'd');
@@ -263,4 +280,5 @@ function trial = calc_direction_idx(trial, exp)
         
 
 end
+
     
