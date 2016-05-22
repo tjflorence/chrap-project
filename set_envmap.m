@@ -1,8 +1,9 @@
 function env_map = set_envmap(track_params)
 %{
-    
-    creates 2x2 tilemap lookup table for tracking
-    modify here to change punished world
+    environment map for light-intensity tuning experiment
+    creates 2x2 tilemap lookup table setting instantaneous light intensity
+    on the fly
+
 
 %}
 

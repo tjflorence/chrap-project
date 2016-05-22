@@ -1,17 +1,25 @@
 function process_PL_experiment(expdir)
 
+%{
+    
+    process single optogenetic place learning experiment
+
+%}
+
 
 cd(expdir)
 
+% if experiment did not complete, remove it
 load('metadata.mat')
-
 if expp.completed == 0
     cd('..')
     rmdir(expdir, 's')
 else
     
+    % collect trial files
     tfiles = dir('trial*');
     
+    % pre-allocate summary structure
     summary_data.mean_speed = nan(1,11);
     summary_data.time_to_target = nan(1,11);
     summary_data.time_at_target = nan(1,11);
@@ -20,8 +28,10 @@ else
     summary_data.PLI_30 = nan;
     summary_data.PLI_60 = nan;
 
+    % iterate over trial files, perform processing functions (defined below)
     for ii = 1:length(tfiles)
-   
+        
+        % process within-trial data file
         load(tfiles(ii).name)
         trial = calc_tspeed(trial, expp);
         trial = calc_theta(trial, expp);
@@ -30,13 +40,14 @@ else
         trial = calc_quad_pref(trial, expp);
         trial = calc_direction_idx(trial, expp);
         
+        % collect each value in summary data 
         summary_data.mean_speed(ii) = nanmean(trial.data.speed(trial.data.speed>5));
         summary_data.time_to_target(ii) = trial.data.time_to_target;
         summary_data.time_at_target(ii) = trial.data.time_at_target;
         summary_data.quad_pref(ii) = trial.data.quad_pref_full;
         summary_data.dir_idx(ii) = trial.data.dir_idx;
         
-        
+        % if trial is trial 11 (mock trial), grab quad pref
         if ii == 11
            
             summary_data.PLI_30 = trial.data.quad_pref_30;
@@ -59,6 +70,10 @@ end
   
 
 function trial = calc_tspeed(trial, expp)
+
+%{
+    calculate fly walking speed
+%}
     
     mm_per_pix = 0.2073;
     
@@ -86,6 +101,9 @@ end
 
 function trial = calc_theta(trial, expp)
 
+%{
+ calculate fly angular orientation
+%}
     xdiff = trial.data.xy(2:end, 1) - trial.data.xy(1:end-1, 1);
     ydiff = trial.data.xy(2:end, 2) - trial.data.xy(1:end-1, 2);
 
@@ -96,6 +114,10 @@ end
 
 
 function trial = calc_time_to_target(trial, expp)
+
+%{
+    find how long it takes fly to first reach target
+%}
 
     c_power = expp.settings.stim_power;
     
@@ -109,6 +131,10 @@ function trial = calc_time_to_target(trial, expp)
 end
 
 function trial = calc_time_at_target(trial, expp)
+
+%{
+    find how long the fly spends at the cool zone
+%}
     
     c_power = expp.settings.stim_power;
 
@@ -124,6 +150,10 @@ function trial = calc_time_at_target(trial, expp)
 end
 
 function trial = calc_quad_pref(trial, expp)
+
+%{
+    calculate preference index, for current trial target quadrant
+%}
 
     split_1 = strsplit(trial.name, 'quad');
     split_2 = strsplit(split_1{2}, 'd');
@@ -229,6 +259,10 @@ function trial = calc_quad_pref(trial, expp)
 end
 
 function trial = calc_direction_idx(trial, expp)
+
+%{
+    calculate direction index
+%}
 
     split_1 = strsplit(trial.name, 'quad');
     split_2 = strsplit(split_1{2}, 'd');

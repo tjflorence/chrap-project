@@ -1,8 +1,13 @@
- disp('turn off fxn generator output, then hit space')
+%{ 
+    runs light-intensity tuning experiment 
+%}
+
+disp('turn off fxn generator output, then hit space')
 pause()
 
-init_memspace
+init_memspace % clear memory 
 
+% reset nidaq interface
 daqObj = daq.createSession('ni');
 daqObj.addAnalogOutputChannel('Dev1', [0:1], 'Voltage');
 daqObj.outputSingleScan([0 -4.99]);
@@ -12,12 +17,14 @@ pause()
 disp('thank you')
 
 %% experiment settings: modify as needed
+% experiment name and notes
 exp.settings.name = 'chrap-curve';
 exp.settings.geno = 'HCxUAS-Chr';
 exp.settings.datecode = datestr(now, 'yyyymmddHHMM');
 exp.settings.notes = '1-2 day old, green lights off';
 exp.settings.full_name = [exp.settings.datecode '_' exp.settings.geno '_' exp.settings.name];
 
+% tracking params & trial times
 exp.settings.std_thresh = 1.2;
 exp.settings.bg_frames = 1000;
 exp.settings.trial_time = 60; % trial time in seconds
@@ -27,7 +34,6 @@ exp.settings.keep_frames = 0;
 exp.settings.rand_order = 0;
 
 exp.settings.rep_order = repmat(exp.settings.light_power, [1 exp.settings.reps_per_power]);
-
 
 if exp.settings.rand_order
     rng(now)
@@ -44,7 +50,7 @@ cd(exp.settings.full_name);
 
 save('metadata.mat', 'exp')
 
-%% initializes camera, daq, env
+%% initializes camera, daq, environment
 [vi, cam_params] = init_cam();
 track_params = gen_track_params(vi, exp.settings.bg_frames, exp.settings.std_thresh);
 env_map = set_envmap(track_params);
@@ -74,15 +80,19 @@ hold on
 
 keepFrame = exp.settings.keep_frames;
 
+% this loop contains the trials
 for ii = 1:length(exp.settings.rep_order)
    
     c_power = exp.settings.rep_order(ii);
     
+    % first run side A
     trial_name = ['trk_' num2str(round(c_power)) '_' num2str(ii, '%02d') '_subA'];
     
     disp(['running trial ' num2str(ii) '/' num2str(length(exp.settings.rep_order)) ' sub A'])
     disp(['current light power is ' num2str(c_power)])
     
+    % occasionally, trial starts and fly cannot be found on first frame
+    % if this happens, re-start the trial
     try
     trial = run_track_trial(vi,daqObj, ...
                     trial_name, exp.settings.trial_time, c_power, ...
@@ -98,9 +108,11 @@ for ii = 1:length(exp.settings.rep_order)
     
     trial_name = ['trk_'   num2str(round(c_power)) '_' num2str(ii, '%02d') '_subB'];
 
+    % now run side B
     disp(['running trial ' num2str(ii) '/' num2str(length(exp.settings.rep_order)) ' sub B'])
     disp(['current light power is ' num2str(c_power)])
 
+    % again, reset if fly cannot be found on first frame
     try
     trial = run_track_trial(vi,daqObj, ...
                     trial_name, exp.settings.trial_time, c_power, ...
@@ -115,11 +127,14 @@ for ii = 1:length(exp.settings.rep_order)
     
 end
 
+% shut light off
 daqObj.outputSingleScan([0 -4.99]);
 
+% finish, save metadata
 exp.completed = 1;
 save('metadata.mat', 'exp')
 
+% cd home
 cd('C:\Users\florencet\Documents\matlab_root')
 
 

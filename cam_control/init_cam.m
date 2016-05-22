@@ -1,6 +1,8 @@
 function [vi, cam_params] = init_cam()
 
 %{ 
+ Initializes camera object
+ 
  General camera notes:
  I. ROI and Framerate
     - to get square frame, set ROIPosition to [368 0 1184 1200])

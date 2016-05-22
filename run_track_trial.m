@@ -7,16 +7,22 @@ function trial = run_track_trial(vi,...
                             env_map, keep_frame)
 %{
     
-    run single trial
+    run single trial for light-intensity tuning experiment
     input: 
-        vi daqObj track_params env_map trial_name light_power trial_time
+        vi - video object
+        daqObj - data acquisition object
+        track_params - tracking parameters
+        env_map - enviornment map: light-intensity lookup table
+        trial_name - name of current trial
+        light_power - baseline light power for current trial
+        trial_time - trial time duration
 
     output:
-        struct
+        trial - struct containing trial data and metadata
 
 %}
 
-
+% clear video buffer
 flushdata(vi);
 
 % collect everything into a struture
@@ -79,6 +85,7 @@ trial.data.p = p;
 stop(vi);
 flushdata(vi);
 
+% calculates cool preference index
 trial.data.pref_idx = (numel(find(trial.data.light==0))-numel(find(trial.data.light==1)))/trial.data.p;
 
 save([trial_name '.mat'], 'trial', '-v7.3')

@@ -1,10 +1,8 @@
 function plot_experiment_trajectory_summary(expdir)
 
 homedir = pwd;
-
 cd(expdir)
-mkdir('plots')
-cd('plots')
+
 
 close all;
 
@@ -141,6 +139,11 @@ box off
 set(gca, 'YTick', [1 30 60 90], 'YTickLabel',{'0      ', '30      ', '60      ', '90      '},  'yaxislocation','right',...
     'XTick', [], 'Fontsize', 25)
 ylabel('time (sec) \newline \newline', 'fontsize', 30, 'rotation', 270)
+
+
+mkdir('plots')
+cd('plots')
+
 
 print(f1, ['trajectory_summary.pdf'], '-dpdf', '-r0', '-opengl');
 

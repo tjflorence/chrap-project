@@ -1,22 +1,29 @@
 function env_map = set_PL_envmap(track_params, edge_type)
 %{
     
-    creates 2x2 tilemap lookup table for tracking
-    modify here to change punished world
+    inputs:
+        track_params - tracking parameters
+        edge_type - string to set edge condition of coolzone to heat-zone
+                    transition
+
+    outputs:
+        env_map - environment map: light intensity lookup table
+
 
 %}
+
 
 env_map(1).lookup = -3*ones(track_params.frame_dim);
 env_map(1).lookup(300:500, 300:500) = -4.99;
 
-    
-if strcmp(edge_type, 'gauss')
+
+if strcmp(edge_type, 'gauss') % gaussian edge
     
     G = fspecial('gaussian',[100 100],50);
     env_map(1).lookup = imfilter(env_map(1).lookup,G,'same');
     env_map(1).lookup(env_map(1).lookup>-3)=-3;
     
-elseif strcmp(edge_type, 'exp')
+elseif strcmp(edge_type, 'exp') % exponential edge
     
     % locate center of cool spot
     cool_inds = find(env_map(1).lookup < -4.9);
@@ -55,6 +62,7 @@ elseif strcmp(edge_type, 'exp')
 end
 
 
+% rotate for other quadrants
 env_map(2).lookup = rot90(env_map(1).lookup, -1);
 env_map(3).lookup = rot90(env_map(2).lookup, -1);
 env_map(4).lookup = rot90(env_map(3).lookup, -1);

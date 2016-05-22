@@ -1,16 +1,33 @@
 function [fly, select_pix, trial] = track_frame(vi, track_params, trial)
 %{
     tracks single frame
-    returns struct of x,y pixel locations, and fly size in pixels
+    returns struct of x,y pixel neighbors, and fly size in pixels
+
+    inputs:
+        vi - video input object
+        track_params - tracking parameters
+        trial - current trial data structure
+
+    outputs:
+        fly - structure with fly X, Y, and other tracking data
+        select_pix - local image around flight
+        trial - current trial data structure
 %}
-    hist_len = 14;
+    hist_len = 14; % sets history length for kalman filter
     
+    % grab latest frame from camera
+    % note: getsnapshot seems to be fastest, least jittery way to grab
+    % frame data
     c_frame = double(getsnapshot(vi));
 
+    % do background subtraction
     diff_frame = abs(track_params.bg-c_frame);
+    % fly pixel inds are those that are greater than threshold
     pix_inds = find(diff_frame>track_params.thresh_val);
 
+    % need xy, not linear index
     [yvals, xvals] = ind2sub(track_params.frame_dim, pix_inds);
+    % raw x, y values
     tentative_x = round(median(xvals));
     tentative_y = round(median(yvals));
     fly.num_pix = length(yvals);
@@ -36,7 +53,7 @@ function [fly, select_pix, trial] = track_frame(vi, track_params, trial)
         
         trial.data.xy_filt(trial.data.p, :) = [tentative_x tentative_y];
         
-    else
+    else % perform kalman filter of tracking results
         
         z = trial.data.xy(trial.data.p-(3*hist_len):trial.data.p,1:2)';
         [x_kf, ~] = StandardKalmanFilter(z, hist_len, hist_len, 'EWMA');
@@ -48,6 +65,7 @@ function [fly, select_pix, trial] = track_frame(vi, track_params, trial)
     fly.x = trial.data.xy_filt(trial.data.p, 1);
     fly.y = trial.data.xy_filt(trial.data.p, 2);
     
+    % grab local pixels to make fly movies later
     select_pix = c_frame((fly.y-30):(fly.y+30), (fly.x-30):(fly.x+30));
     
     

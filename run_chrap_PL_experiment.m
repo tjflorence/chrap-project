@@ -1,9 +1,14 @@
+%{ 
+    runs optogenetic version of place-learning experiment
+%}
 
 disp('turn off fxn generator output, then hit space')
 pause()
 
+% clear memory space
 init_memspace
 
+% reset nidaq interface
 daqObj = daq.createSession('ni');
 daqObj.addAnalogOutputChannel('Dev1', [0:1], 'Voltage');
 daqObj.outputSingleScan([0 -4.99]);
@@ -12,6 +17,7 @@ disp('turn on fxn generator output, then hit space')
 pause()
 disp('thank you')
 
+% set pattern id, then shut off display
 Panel_com('set_pattern_id', [2])
 Panel_com('all_off')
 
@@ -33,6 +39,7 @@ expp.settings.edge_type = 'exp';
 expp.settings.pattern_x = [41 185 137 89 0];
 rng(now);
 
+% sets randomization of pattern rotation
 rotvec = [-1*ones(1,5) ones(1,5)];
 expp.settings.rotvec = [0 rotvec(randperm(length(rotvec)))];
 pdice = [1 2;...
@@ -67,6 +74,7 @@ save('metadata.mat', 'expp')
 
 track_params = gen_track_params(vi, expp.settings.bg_frames, expp.settings.std_thresh, daqObj);
 
+% set_PL_envmap creates light-intensity lookup table
 env_map = set_PL_envmap(track_params, expp.settings.edge_type);
 
 expp.track_params = track_params;
@@ -89,6 +97,7 @@ box off
 hold on
 drawnow
 
+
 %disp('running pre-trial')
 %trial_name = 'ante_00_quad_2';
 %pat_x = expp.settings.pattern_x(5);
@@ -109,17 +118,19 @@ drawnow
 
 
 
+%% this loop controls the actual trials
 for ii = 1:length(expp.settings.quad_order)
    
+    % c_quad is current quadrant target
     c_quad = expp.settings.quad_order(ii);
     
-    if ii < 11
+    if ii < 11 % if this is a training trial, use environment with a cool zone
         
         trial_name = ['trial_' num2str(ii, '%02d') '_train_quad' num2str(c_quad, '%02d')];
         pat_x = expp.settings.pattern_x(c_quad);
         c_map = expp.env_map(c_quad).lookup;
         
-    else
+    else % if this is a probe trial, use uniform heat environment
         
         trial_name = ['trial_' num2str(ii, '%02d') '_probe_quad' num2str(c_quad, '%02d')];
         pat_x = expp.settings.pattern_x(c_quad);
@@ -129,6 +140,8 @@ for ii = 1:length(expp.settings.quad_order)
     
     disp(['running trial ' num2str(ii) '/' num2str(length(expp.settings.quad_order))])
     
+    % again, sometimes fly cannot be found on first frame. re-start trial
+    % if this is the case
     try
         
             trial = run_PL_track_trial(vi,daqObj, ...
@@ -157,9 +170,12 @@ for ii = 1:length(expp.settings.quad_order)
 
     
 end
+
+% complete and save metadata
 expp.completed = 1;
 save('metadata.mat', 'expp')
 
+% plot probe trial
 figure
 imagesc(env_map(1).lookup)
 hold on
@@ -167,6 +183,7 @@ plot(trial.data.xy(:,1), trial.data.xy(:,2), 'r')
 scatter(trial.data.xy(1:1500,1), trial.data.xy(1:1500,2), 'r')
 axis equal
 
+% shut everything off
 Panel_com('all_off')
 daqObj.outputSingleScan([0 -4.99]);
 

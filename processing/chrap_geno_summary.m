@@ -1,3 +1,9 @@
+%{
+
+script to plot genotype-level summaries of light avoidance experiment
+
+%}
+
 cd('/Users/florencet/Documents/matlab_root/chrap-project')
 
 geno(1).strterm = '*Empty*'

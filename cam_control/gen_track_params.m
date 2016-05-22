@@ -17,16 +17,19 @@ track_params, a structure which includes
     background
 %}
 
-start(vi);
+% grab single frame to get frame dimension
+start(vi); 
 pause(.01);
-test_frame = getsnapshot(vi);
+test_frame = getsnapshot(vi); 
 stop(vi);
 flushdata(vi);
 
 frame_dims = size(test_frame);
 
+% save space for frames in memory
 frame_mat = nan(frame_dims(1), frame_dims(2), num_frames);
 
+% acquire backgroung frames
 start(vi);
 disp('generating bg image')
 disp(['expected_wait: ' num2str(num_frames/40, '%.4g') ' seconds'])
@@ -45,8 +48,8 @@ stop(vi);
 flushdata(vi);
 disp('completed')
 
-bg_frame = mean(frame_mat, 3);
-std_frame = std(frame_mat, [], 3);
+bg_frame = mean(frame_mat, 3); % average background frame
+std_frame = std(frame_mat, [], 3); % std dev frame
 
 track_params.bg = double(bg_frame);
 track_params.max_std = max(max(std_frame));

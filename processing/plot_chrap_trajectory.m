@@ -1,5 +1,10 @@
 function plot_chrap_trajectory(expdir)
 
+%{
+
+    plots single-fly trajectories for light avoidance tuning experiment
+
+%}
 close all
 
 cd(expdir)

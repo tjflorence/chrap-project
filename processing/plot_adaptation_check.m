@@ -1,5 +1,12 @@
 function plot_adaptation_check(expdir)
 
+%{
+
+ makes summary plot to examine early-trial vs late-trial responses to light
+ exposure at a given intensity
+
+%}
+
     cd(expdir)
     
     close all

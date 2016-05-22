@@ -1,4 +1,8 @@
+%{
+    
+    script for debugging light-avoidance trajectory plotting function
 
+%}
 
 close all;
 
